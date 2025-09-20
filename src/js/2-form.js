@@ -6,32 +6,43 @@ let formData = {
   message: "",
 };
 
-// 1. Відновлення даних при завантаженні
-const savedData = localStorage.getItem(STORAGE_KEY);
-if (savedData) {
-  formData = JSON.parse(savedData);
-  form.elements.email.value = formData.email || "";
-  form.elements.message.value = formData.message || "";
+const saved = localStorage.getItem(STORAGE_KEY);
+if (saved) {
+  const parsed = JSON.parse(saved);
+  formData = {
+    email: parsed.email || "",
+    message: parsed.message || "",
+  };
+  form.elements.email.value = formData.email;
+  form.elements.message.value = formData.message;
 }
 
-// 2. Слухач input
 form.addEventListener("input", (e) => {
-  formData[e.target.name] = e.target.value.trim();
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+  const { name, value } = e.target;
+  formData[name] = value;
+  const toSave = {
+    email: formData.email.trim(),
+    message: formData.message.trim(),
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
 });
 
-// 3. Слухач submit
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  if (!formData.email || !formData.message) {
+  const dataToSubmit = {
+    email: form.elements.email.value.trim(),
+    message: form.elements.message.value.trim(),
+  };
+
+  if (!dataToSubmit.email || !dataToSubmit.message) {
     alert("Fill please all fields");
     return;
   }
 
-  console.log(formData);
+  console.log(dataToSubmit);
 
   localStorage.removeItem(STORAGE_KEY);
-  formData = { email: "", message: "" };
   form.reset();
+  formData = { email: "", message: "" };
 });
